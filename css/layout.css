@@ -1,0 +1,18 @@
+.app { max-width: 920px; margin: 0 auto; padding: 1rem 1rem 3rem; }
+.tela { animation: entrar .3s ease both; }
+
+.inicio { display: grid; gap: 1.2rem; padding-top: 1.5rem; }
+.inicio-hero { text-align: center; background: linear-gradient(135deg, var(--navy), var(--navy-2)); color: #fff; padding: 2.2rem 1.2rem; border-radius: var(--raio); box-shadow: var(--sombra); }
+.inicio-hero h1 { color: var(--gold); letter-spacing: .06em; }
+.subtitulo { margin-top: .6rem; font-size: 1.05rem; opacity: .95; font-style: italic; }
+.inicio-card, .inicio-explica, .espera { background: var(--card); border-radius: var(--raio); padding: 1.4rem; box-shadow: var(--sombra); }
+.inicio-card label { display: block; font-weight: 700; margin-bottom: .35rem; }
+.inicio-card input { width: 100%; padding: .8rem 1rem; border: 2px solid var(--line); border-radius: 12px; background: #fff; }
+.inicio-card input:focus { border-color: var(--navy); }
+.campo-erro { color: var(--alerta); font-weight: 600; min-height: 1.4em; font-size: .9rem; }
+.inicio-botoes { display: grid; gap: .7rem; margin-top: .7rem; }
+.inicio-explica ul { display: grid; gap: .5rem; }
+.inicio-explica li { padding-left: 1.4rem; position: relative; }
+.inicio-explica li::before { content: "▸"; position: absolute; left: 0; color: var(--gold-d); font-weight: 700; }
+.aviso-storage { background: #fff0cf; border: 2px solid var(--gold-d); color: #5a3d00; padding: .7rem 1rem; border-radius: 12px; font-weight: 600; }
+.espera { text-align: center; display: grid; gap: 1rem; margin-top: 1.5rem; }

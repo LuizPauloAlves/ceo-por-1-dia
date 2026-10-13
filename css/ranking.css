@@ -1,0 +1,8 @@
+.ranking { background: var(--card); border-radius: var(--raio); padding: 1.4rem; box-shadow: var(--sombra); margin-top: 1rem; display: grid; gap: .8rem; }
+.tabela-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tabela-ranking { width: 100%; min-width: 720px; font-size: .88rem; }
+.tabela-ranking th { background: var(--navy); color: #fff; padding: .5rem .6rem; text-align: left; white-space: nowrap; }
+.tabela-ranking td { padding: .5rem .6rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tabela-ranking .nick { font-weight: 700; max-width: 14ch; overflow: hidden; text-overflow: ellipsis; }
+.tabela-ranking .pts { font-weight: 800; color: var(--navy); }
+.tabela-ranking tr.destaque td { background: #fff3c4; }

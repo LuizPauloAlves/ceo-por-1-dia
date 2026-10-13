@@ -1,0 +1,8 @@
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes sobe { 0% { transform: scale(1); background: #fff; } 35% { transform: scale(1.06); background: #d8f5e4; } 100% { transform: scale(1); background: #fff; } }
+@keyframes desce { 0% { transform: translateX(0); background: #fff; } 20%, 60% { transform: translateX(-4px); background: #fddcd9; } 40%, 80% { transform: translateX(4px); background: #fddcd9; } 100% { transform: none; background: #fff; } }
+@keyframes pulsar { 50% { transform: scale(1.12); } }
+@keyframes alerta-borda { 0%, 100% { box-shadow: 0 8px 28px rgba(198,40,40,.25); } 50% { box-shadow: 0 0 0 6px rgba(198,40,40,.35), 0 8px 28px rgba(198,40,40,.45); } }
+.ind.sobe { animation: sobe .9s ease; }
+.ind.desce { animation: desce .7s ease; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

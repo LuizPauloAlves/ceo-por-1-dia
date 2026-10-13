@@ -1,0 +1,21 @@
+@media (min-width: 700px) {
+  .inicio-botoes { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .res-botoes { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 720px) {
+  .indicadores { grid-template-columns: repeat(2, 1fr); gap: .4rem; padding: .4rem .6rem .5rem; }
+  .ind { padding: .35rem .5rem; gap: .4rem; }
+  .ind-icone { font-size: 1.15rem; min-width: 1.3rem; }
+  .ind-valor { font-size: 1rem; }
+  .nome-longo { display: none; } .nome-curto { display: inline; }
+  .cabecalho { padding: .35rem .7rem 0; font-size: .78rem; gap: .2rem .7rem; }
+  .app { padding: .7rem .7rem 2.5rem; }
+  .questao, .feedback, .emergencia { padding: 1rem; }
+  .em-faixa { margin: -1rem -1rem .8rem; padding: .5rem 1rem; }
+  .q-titulo { font-size: 1.15rem; }
+  .em-tempo { font-size: 1.8rem; }
+  .impactos li { grid-template-columns: 1fr auto; }
+  .imp-novo { grid-column: 1 / -1; text-align: left; }
+  .imp-delta { text-align: right; }
+}
+@media (max-width: 380px) { .cabecalho .progresso { flex-basis: 100%; order: 5; } }

@@ -1,0 +1,9 @@
+.barra-fixa { position: sticky; top: 0; z-index: 20; background: var(--navy); color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.25); padding-top: env(safe-area-inset-top, 0); }
+.banners:not(:empty) ~ .barra-fixa { top: 38px; }
+.cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem 1rem; max-width: 920px; margin: 0 auto; padding: .5rem 1rem 0; font-size: .85rem; }
+.cabecalho .marca { font-weight: 800; letter-spacing: .08em; color: var(--gold); }
+.cabecalho .jogador { font-weight: 600; max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cabecalho .progresso { opacity: .9; }
+.cabecalho .pontos { margin-left: auto; font-weight: 700; }
+.selo-save { font-size: .75rem; padding: .1rem .5rem; border-radius: 999px; background: rgba(255,255,255,.12); }
+.selo-save.ok { color: #7ee2a8; } .selo-save.erro, .selo-save.conflito { color: #ffb4ab; font-weight: 700; }

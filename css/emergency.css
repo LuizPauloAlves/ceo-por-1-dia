@@ -1,0 +1,11 @@
+.emergencia { background: #fff7f6; border-radius: var(--raio); padding: 1.3rem; box-shadow: 0 8px 28px rgba(198, 40, 40, .25); border: 3px solid var(--alerta); position: relative; }
+.em-faixa { display: flex; justify-content: space-between; align-items: center; background: var(--alerta); color: #fff; margin: -1.3rem -1.3rem 1rem; padding: .55rem 1.3rem; border-radius: 12px 12px 0 0; font-weight: 800; letter-spacing: .1em; }
+.em-numero { font-size: .8rem; opacity: .9; letter-spacing: .05em; }
+.em-tipo { color: var(--alerta); font-size: 1.5rem; letter-spacing: .04em; margin-bottom: .5rem; margin-top: 0; }
+.emergencia .q-titulo { color: #4a1311; }
+.emergencia .alt { background: #fff; border-color: #f0c4c0; }
+.emergencia .alt:hover:not(:disabled) { border-color: var(--alerta); background: #fff0ee; }
+.emergencia .alt-letra { background: var(--alerta); }
+.emergencia .alt.escolhida { border-color: var(--alerta); background: #ffe5e2; }
+.emergencia .q-situacao { color: #3b2321; }
+.emergencia .q-pergunta { color: #7a1410; }

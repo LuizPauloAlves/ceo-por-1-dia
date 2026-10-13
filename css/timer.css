@@ -1,0 +1,9 @@
+.em-relogio { display: flex; align-items: baseline; gap: .6rem; font-weight: 700; color: #4a1311; margin-bottom: .4rem; }
+.em-tempo { font-size: 2.2rem; font-variant-numeric: tabular-nums; color: var(--alerta); letter-spacing: .04em; }
+.em-barra { height: 12px; border-radius: 6px; background: #f3d4d1; overflow: hidden; margin-bottom: 1rem; }
+.em-barra-preench { display: block; height: 100%; width: 100%; background: #e0a100; transition: width .3s linear, background .5s; }
+.faixa-atencao .em-barra-preench { background: #e8620c; }
+.faixa-critico .em-barra-preench { background: var(--alerta); }
+.faixa-atencao { background: #fff1e6; }
+.faixa-critico { background: #ffe3e0; animation: alerta-borda .8s ease-in-out infinite; }
+.faixa-critico .em-tempo { animation: pulsar .8s ease-in-out infinite; }

@@ -1,0 +1,15 @@
+.resultado { background: var(--card); border-radius: var(--raio); padding: 1.5rem; box-shadow: var(--sombra); margin-top: 1rem; border-top: 6px solid var(--pos); }
+.resultado.derrota { border-top-color: var(--alerta); }
+.res-jogador { font-weight: 700; color: var(--muted); }
+.res-motivo { margin: .6rem 0 1rem; font-size: 1.05rem; }
+.res-pontuacao { display: grid; justify-items: center; background: var(--navy); color: #fff; border-radius: var(--raio); padding: 1rem; margin-bottom: 1rem; }
+.res-pontuacao strong { font-size: 3rem; color: var(--gold); line-height: 1; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .6rem; }
+.stat { background: #f3f6f9; border-radius: 12px; padding: .7rem; display: grid; }
+.stat span { font-size: .78rem; color: var(--muted); } .stat strong { font-size: 1.2rem; color: var(--navy); }
+.historico { display: grid; gap: .5rem; max-height: 420px; overflow: auto; padding-right: .3rem; }
+.historico li { display: flex; gap: .6rem; padding: .5rem .7rem; background: #f7f9fb; border-radius: 10px; font-size: .9rem; }
+.historico li > div { display: grid; min-width: 0; }
+.hist-esc { color: var(--muted); font-size: .82rem; }
+.hist-imp { display: flex; gap: .6rem; flex-wrap: wrap; font-weight: 700; font-size: .8rem; }
+.res-botoes { display: grid; gap: .7rem; margin-top: 1.5rem; }

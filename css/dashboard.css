@@ -1,0 +1,15 @@
+.indicadores { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; max-width: 920px; margin: 0 auto; padding: .5rem 1rem .7rem; }
+.ind { position: relative; display: flex; align-items: center; gap: .6rem; background: #fff; color: var(--ink); border-radius: 12px; padding: .5rem .7rem; border-left: 5px solid var(--cor); flex-wrap: wrap; overflow: hidden; }
+.ind-fin { --cor: var(--fin); } .ind-cli { --cor: var(--cli); } .ind-eq { --cor: var(--eq); } .ind-op { --cor: var(--op); }
+.ind-icone { font-size: 1.4rem; font-weight: 800; color: var(--cor); min-width: 1.6rem; text-align: center; }
+.ind-texto { display: grid; line-height: 1.15; min-width: 0; flex: 1; }
+.ind-nome { font-size: .68rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.nome-curto { display: none; }
+.ind-valor { font-size: 1.15rem; color: var(--navy); font-variant-numeric: tabular-nums; }
+.ind-barra { flex-basis: 100%; height: 5px; border-radius: 3px; background: #e5ebf1; overflow: hidden; }
+.ind-barra-preench { display: block; height: 100%; background: var(--cor); transition: width .6s ease; }
+.ind.critico { box-shadow: inset 0 0 0 2px var(--alerta); }
+.ind.critico .ind-valor { color: var(--alerta); }
+.ind-delta { position: absolute; top: 3px; right: 6px; font-size: .78rem; font-weight: 800; opacity: 0; transform: translateY(6px); transition: opacity .3s, transform .3s; background: #fff; padding: 0 .3rem; border-radius: 6px; }
+.ind-delta.visivel { opacity: 1; transform: none; }
+.ind-delta.pos { color: var(--pos); } .ind-delta.neg { color: var(--neg); }
