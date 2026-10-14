@@ -130,16 +130,16 @@ test("nickname: obrigatório e limitado a 20 caracteres", () => {
 
 test("indicadores iniciais e exemplo do enunciado (-1.500, +5, -8, +3)", () => {
   const e = novo();
-  assert.deepEqual(e.indicadores, { financeiro: 25000, clientes: 65, equipe: 65, operacao: 60 });
+  assert.deepEqual(e.indicadores, { financeiro: 100000, clientes: 50, equipe: 50, operacao: 50 });
   const r = aplicarImpactos("x1", { financeiro: -1500, clientes: 5, equipe: -8, operacao: 3 });
-  assert.deepEqual(getState().indicadores, { financeiro: 23500, clientes: 70, equipe: 57, operacao: 63 });
+  assert.deepEqual(getState().indicadores, { financeiro: 98500, clientes: 55, equipe: 42, operacao: 53 });
   assert.equal(r.derrota, null);
 });
 
 test("limites 0..100, caixa sem teto e idempotência por eventoId", () => {
   const e = novo();
   aplicarImpactos("a", { financeiro: 1000000, clientes: 90, equipe: 0, operacao: 0 });
-  assert.equal(e.indicadores.clientes, 100); assert.equal(e.indicadores.financeiro, 1025000);
+  assert.equal(e.indicadores.clientes, 100); assert.equal(e.indicadores.financeiro, 1100000);
   const antes = JSON.stringify(e.indicadores);
   assert.equal(aplicarImpactos("a", { financeiro: -999999, clientes: -50, equipe: -50, operacao: -50 }).duplicado, true);
   assert.equal(JSON.stringify(e.indicadores), antes);
@@ -147,21 +147,25 @@ test("limites 0..100, caixa sem teto e idempotência por eventoId", () => {
 });
 
 test("derrota por qualquer indicador zerado", () => {
-  for (const [k, v] of [["financeiro", -25000], ["clientes", -65], ["equipe", -70], ["operacao", -60]]) {
+  for (const [k, v] of [["financeiro", -100000], ["clientes", -50], ["equipe", -70], ["operacao", -60]]) {
     resetar(); novo();
     assert.equal(aplicarImpactos("d", { [k]: v }).derrota.indicador, k, k);
   }
   assert.equal(verificarDerrota({ financeiro: 1, clientes: 1, equipe: 1, operacao: 1 }), null);
 });
 
-test("pontuação: limitada a 1000, financeiro com teto, consistente", () => {
+test("pontuação: estado inicial = 500, máximo 1000, financeiro com teto, derrota penalizada", () => {
   const e = novo();
+  assert.equal(calcularPontuacao(e), 500);
   e.indicadores = { financeiro: 1e9, clientes: 100, equipe: 100, operacao: 100 };
-  e.progresso = { normaisConcluidas: 20, emergenciasConcluidas: 5, emergenciasNoPrazo: 5, emergenciasExpiradas: 0 };
   e.resultado = { concluiu: true };
   assert.equal(calcularPontuacao(e), 1000);
-  e.resultado = { concluiu: false }; e.progresso.emergenciasNoPrazo = 0;
-  assert.equal(calcularPontuacao(e), 1000 - 100 - 40);
+  e.indicadores = { financeiro: 200000, clientes: 0, equipe: 0, operacao: 0 };
+  assert.equal(calcularPontuacao(e), 250);
+  e.indicadores = { financeiro: 100000, clientes: 100, equipe: 50, operacao: 50 };
+  assert.equal(calcularPontuacao(e), 625);
+  e.status = "encerrada"; e.resultado = { concluiu: false };
+  assert.equal(calcularPontuacao(e), Math.round(625 * 0.3));
 });
 
 test("ranking: ordena, desempata, limita a 10, ignora partida repetida e cabe em cookies", () => {

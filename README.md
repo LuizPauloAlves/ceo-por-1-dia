@@ -20,15 +20,15 @@ Hospedagem estática (GitHub Pages, Netlify, Vercel, S3, Nginx): basta publicar 
 npm test      # Node 18+ (usa node:test, sem dependências)
 ```
 
-39 testes: regras isoladas (probabilidades, seleção, embaralhamento, variação, limites, pontuação, ranking), fluxo do motor (gatilhos A/B/C, emergências, expiração, F5, efeito borboleta, derrota, duas abas, storage bloqueado) e uma simulação de 300 partidas aleatórias que verifica invariantes e ausência de travamentos.
+44 testes: regras isoladas (probabilidades, seleção, embaralhamento, variação, limites, pontuação, ranking), fluxo do motor (gatilhos A/B/C, emergências, expiração, F5, efeito borboleta, derrota, duas abas, storage bloqueado) uma simulação de 300 partidas aleatórias (invariantes e ausência de travamentos) e testes de balanceamento por estratégia (melhor, 2ª, 3ª e pior alternativa; ver abaixo).
 
 ## Dados (`data/`)
 
-`atividades.json` (100 problemas, 400 efeitos borboleta) e `emergencias.json` (60 emergências) são os arquivos fornecidos, sem alteração. `js/core/dataAdapter.js` os converte para o formato interno: resolve as referências `{"$var": ...}` em intervalos `{padrao, min, max}` e valida cada item (4 alternativas, impactos completos, pior alternativa da emergência). Itens inválidos são ignorados com aviso; JSON ausente ou malformado mostra uma tela de erro.
+`atividades.json` (100 problemas, 400 efeitos borboleta) e `emergencias.json` (60 emergências) foram revisados (textos em linguagem simples e impactos refeitos com trade-off em cada alternativa). `js/core/dataAdapter.js` os converte para o formato interno: resolve as referências `{"$var": ...}` em intervalos `{padrao, min, max}` e valida cada item (4 alternativas, impactos completos, pior alternativa da emergência). Itens inválidos são ignorados com aviso; JSON ausente ou malformado mostra uma tela de erro.
 
 ## Decisões de projeto e pontos de atenção
 
-- **Valores iniciais**: usam os do enunciado (R$ 25.000 / 65 / 65 / 60). Os JSON trazem 200.000 / 50 / 50 / 50, que são ignorados.
+- **Valores iniciais**: R$ 100.000 / 50 / 50 / 50 (iguais aos dos JSON). Terminar a partida exatamente com esses valores vale **500 pontos**.
 - **Variação de impactos**: sorteio inteiro dentro de `min`/`max` do próprio JSON (o enunciado manda priorizar os intervalos dos dados), nunca invertendo o sinal nem zerando. O modo "±20 %" existe em `gameConfig.js` (`variacao.modo = "percentual"`).
 - **Duração das emergências**: fixa em 120 s (enunciado). O `tempo_limite_segundos` do JSON (60 a 120) é lido, mas não usado.
 - **Pior alternativa** no timeout: `gabarito.alternativa_pior_caso_id` do JSON.
@@ -39,15 +39,32 @@ npm test      # Node 18+ (usa node:test, sem dependências)
 
 ## Pontuação (0 a 1000)
 
-| Parcela | Cálculo | Máx. |
-|---|---|---:|
-| Clientes, equipe, operação | valor × 2 cada | 600 |
-| Financeiro | caixa ÷ (2 × R$ 25.000), com teto em 1 | 200 |
-| Atividades concluídas | 3 por atividade | 60 |
-| Emergências no prazo | 8 por emergência | 40 |
-| Conclusão integral | bônus | 100 |
+`pontuação = 1000 × média de [caixa ÷ (2 × R$ 100.000) (teto 1), clientes ÷ 100, equipe ÷ 100, operação ÷ 100]`
 
-Desempate no ranking: mais indicadores em valor igual ou superior ao inicial, depois menos emergências expiradas, depois a partida mais antiga. Tudo configurável em `js/core/gameConfig.js`.
+| Situação | Pontuação |
+|---|---:|
+| Terminar com 100.000 / 50 / 50 / 50 | 500 |
+| Caixa ≥ R$ 200.000 e os três indicadores em 100 | 1000 |
+| Derrota (algum indicador zerado) | pontuação × 0,3 |
+
+Cada indicador vale 250 pontos no máximo: 1 ponto de clientes/equipe/operação = 2,5 pontos de placar; R$ 1.000 de caixa = 1,25 ponto. Parâmetros em `js/core/gameConfig.js`.
+
+Desempate no ranking: mais indicadores em valor igual ou superior ao inicial, depois menos emergências expiradas, depois a partida mais antiga.
+
+## Balanceamento dos dados
+
+Cada decisão (atividade, desdobramento ou emergência) tem 4 alternativas, todas com ganho e custo, e nenhuma domina outra. Para o placar, as alternativas de cada decisão têm saldo nominal em torno de **+19 / +0,5 / −2,5 / −16** pontos de placar (melhor, 2ª, 3ª, pior), distribuído por igual entre caixa, clientes, equipe e operação — ninguém ganha o jogo olhando só para um indicador. Resultado medido nas simulações (≈ 43 decisões por partida):
+
+| Estratégia | Pontuação média |
+|---|---:|
+| Sempre a melhor | ≈ 945 |
+| Sempre a 2ª melhor | ≈ 540 |
+| 2ª ou 3ª ao acaso | ≈ 465 |
+| Sempre a 3ª | ≈ 390 |
+| Escolhas aleatórias | ≈ 505 |
+| Sempre a pior | ≈ 70 (derrota antes do fim) |
+
+A "melhor" alternativa é a de maior saldo nominal; ela não é perfeita (sempre tem um custo) e não aparece indicada ao jogador.
 
 ## Estrutura
 

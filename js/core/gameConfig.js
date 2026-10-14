@@ -15,8 +15,8 @@ export const CONFIG = Object.freeze({
 
   nicknameMax: 20,
 
-  // Valores iniciais do enunciado (os JSON trazem 200.000/50/50/50, mas o enunciado prevalece).
-  indicadoresIniciais: Object.freeze({ financeiro: 25000, clientes: 65, equipe: 65, operacao: 60 }),
+  // Valores iniciais: R$ 100.000 e 50 pontos em cada indicador (mesmos valores dos JSON). Valem 500 pontos.
+  indicadoresIniciais: Object.freeze({ financeiro: 100000, clientes: 50, equipe: 50, operacao: 50 }),
   limitePontos: Object.freeze({ min: 0, max: 100 }),
 
   meta: Object.freeze({ atividadesNormais: 20, emergencias: 5 }),
@@ -46,14 +46,13 @@ export const CONFIG = Object.freeze({
   // Efeito borboleta: dias_depois (JSON) -> número de atividades normais até o evento.
   consequencias: Object.freeze({ diasPorAtividade: 30, minAtividades: 1, maxAtividades: 4 }),
 
-  // Pontuação máxima = 4*200 + 60 + 40 + 100 = 1000
+  // Pontuação de 0 a 1000 = 1000 x média dos quatro indicadores normalizados (0 a 1).
+  //  - clientes, equipe e operação: valor / 100;
+  //  - financeiro: caixa / (2 x caixa inicial), com teto em 1.
+  // Estado inicial (100.000 / 50 / 50 / 50) = 500 pontos. Derrota: a pontuação é multiplicada por penalidadeDerrota.
   pontuacao: Object.freeze({
-    pesoIndicadorPontos: 2,
     financeiroMultiploTeto: 2,
-    financeiroMax: 200,
-    porAtividade: 3,
-    porEmergenciaNoPrazo: 8,
-    bonusConclusao: 100,
+    penalidadeDerrota: 0.3,
   }),
 
   ranking: Object.freeze({ maxRegistros: 10, cookieDias: 400, cookieBytesMax: 3800 }),

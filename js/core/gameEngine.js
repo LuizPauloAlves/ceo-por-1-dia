@@ -44,6 +44,7 @@ export function novaPartida(nickname, { forcar = false } = {}) {
   if (!forcar && Save.outraAbaAtiva()) return { ok: false, erro: "Há outra aba com o jogo aberto. Feche-a ou assuma o controle.", outraAba: true };
   Save.assumirControle();
   setState(criarEstadoInicial(nick.valor, Progresso.calcularMetas(catalogo)));
+  getState().pontuacao = calcularPontuacao(getState()); // estado inicial = 500 pontos
   const r = Save.salvar();
   iniciarLoop();
   mostrar();

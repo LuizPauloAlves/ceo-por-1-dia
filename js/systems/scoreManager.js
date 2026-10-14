@@ -24,22 +24,21 @@ export function indicadoresPreservados(ind) {
 }
 
 /**
- * Pontuação final (0 a 1000), documentada no README:
- *  - Clientes, equipe e operação: valor x 2 (até 200 cada);
- *  - Financeiro: proporcional ao caixa, com teto em 2x o capital inicial (até 200);
- *  - 3 pontos por atividade normal concluída (até 60);
- *  - 8 pontos por emergência resolvida no prazo (até 40);
- *  - +100 pela conclusão integral da partida.
+ * Pontuação (0 a 1000), documentada no README:
+ *  1000 x média de [caixa / (2 x caixa inicial) (teto 1), clientes / 100, equipe / 100, operação / 100].
+ *  Os valores iniciais (100.000 / 50 / 50 / 50) valem 500. Se a partida termina em derrota,
+ *  a pontuação é multiplicada por CONFIG.pontuacao.penalidadeDerrota.
  */
 export function calcularPontuacao(e) {
   const P = CONFIG.pontuacao;
   const ind = e.indicadores;
-  const fin = Math.min(Math.max(ind.financeiro, 0) / (CONFIG.indicadoresIniciais.financeiro * P.financeiroMultiploTeto), 1) * P.financeiroMax;
-  const pts = (ind.clientes + ind.equipe + ind.operacao) * P.pesoIndicadorPontos;
-  const base = fin + pts
-    + e.progresso.normaisConcluidas * P.porAtividade
-    + e.progresso.emergenciasNoPrazo * P.porEmergenciaNoPrazo
-    + (e.resultado?.concluiu ? P.bonusConclusao : 0);
+  const norm = (v, max) => Math.min(Math.max(v, 0) / max, 1);
+  const soma = norm(ind.financeiro, CONFIG.indicadoresIniciais.financeiro * P.financeiroMultiploTeto)
+    + norm(ind.clientes, CONFIG.limitePontos.max)
+    + norm(ind.equipe, CONFIG.limitePontos.max)
+    + norm(ind.operacao, CONFIG.limitePontos.max);
+  let base = 1000 * soma / 4;
+  if (e.status === "encerrada" && !e.resultado?.concluiu) base *= P.penalidadeDerrota;
   return Math.round(base);
 }
 
