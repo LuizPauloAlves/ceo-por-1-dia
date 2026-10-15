@@ -24,22 +24,34 @@ export function indicadoresPreservados(ind) {
 }
 
 /**
+ * Converte os indicadores para a escala 0–100 usada na pontuação.
+ *  - caixa: R$ 100.000 = 50 pontos, R$ 200.000 = 100 pontos (proporcional; teto 100, piso 0);
+ *  - clientes, equipe e operação: já estão em 0–100.
+ */
+export function indicadoresNormalizados(ind) {
+  const P = CONFIG.pontuacao;
+  const faixa = (v) => Math.min(100, Math.max(0, v));
+  return {
+    financeiro: faixa((ind.financeiro / P.caixaParaCemPontos) * 100),
+    clientes: faixa(ind.clientes),
+    equipe: faixa(ind.equipe),
+    operacao: faixa(ind.operacao),
+  };
+}
+
+/**
  * Pontuação (0 a 1000), documentada no README:
- *  1000 x média de [caixa / (2 x caixa inicial) (teto 1), clientes / 100, equipe / 100, operação / 100].
- *  Os valores iniciais (100.000 / 50 / 50 / 50) valem 500. Se a partida termina em derrota,
- *  a pontuação é multiplicada por CONFIG.pontuacao.penalidadeDerrota.
+ *   pontuação = 10 x [ 80% x média geométrica + 20% x média aritmética ] dos quatro indicadores em 0–100.
+ *  - A média geométrica premia o equilíbrio: um indicador fraco puxa o resultado para baixo e
+ *    um indicador zerado (derrota) anula essa parte; os 20% aritméticos preservam o que foi construído.
+ *  - Estado inicial (100.000 / 50 / 50 / 50) = 500. Tudo no máximo (200.000 / 100 / 100 / 100) = 1000.
  */
 export function calcularPontuacao(e) {
   const P = CONFIG.pontuacao;
-  const ind = e.indicadores;
-  const norm = (v, max) => Math.min(Math.max(v, 0) / max, 1);
-  const soma = norm(ind.financeiro, CONFIG.indicadoresIniciais.financeiro * P.financeiroMultiploTeto)
-    + norm(ind.clientes, CONFIG.limitePontos.max)
-    + norm(ind.equipe, CONFIG.limitePontos.max)
-    + norm(ind.operacao, CONFIG.limitePontos.max);
-  let base = 1000 * soma / 4;
-  if (e.status === "encerrada" && !e.resultado?.concluiu) base *= P.penalidadeDerrota;
-  return Math.round(base);
+  const n = Object.values(indicadoresNormalizados(e.indicadores));
+  const aritmetica = n.reduce((t, v) => t + v, 0) / n.length;
+  const geometrica = n.some((v) => v <= 0) ? 0 : Math.exp(n.reduce((t, v) => t + Math.log(v), 0) / n.length);
+  return Math.round(10 * (P.pesoGeometrica * geometrica + P.pesoAritmetica * aritmetica));
 }
 
 /**

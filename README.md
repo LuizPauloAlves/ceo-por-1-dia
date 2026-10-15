@@ -20,7 +20,7 @@ Hospedagem estática (GitHub Pages, Netlify, Vercel, S3, Nginx): basta publicar 
 npm test      # Node 18+ (usa node:test, sem dependências)
 ```
 
-44 testes: regras isoladas (probabilidades, seleção, embaralhamento, variação, limites, pontuação, ranking), fluxo do motor (gatilhos A/B/C, emergências, expiração, F5, efeito borboleta, derrota, duas abas, storage bloqueado) uma simulação de 300 partidas aleatórias (invariantes e ausência de travamentos) e testes de balanceamento por estratégia (melhor, 2ª, 3ª e pior alternativa; ver abaixo).
+45 testes: regras isoladas (probabilidades, seleção, embaralhamento, variação, limites, pontuação, ranking), fluxo do motor (gatilhos A/B/C, emergências, expiração, F5, efeito borboleta, derrota, duas abas, storage bloqueado) uma simulação de 300 partidas aleatórias (invariantes e ausência de travamentos) e testes de balanceamento por estratégia (melhor, 2ª, 3ª e pior alternativa; ver abaixo) e a checagem do padrão de atributos de cada decisão.
 
 ## Dados (`data/`)
 
@@ -39,30 +39,55 @@ npm test      # Node 18+ (usa node:test, sem dependências)
 
 ## Pontuação (0 a 1000)
 
-`pontuação = 1000 × média de [caixa ÷ (2 × R$ 100.000) (teto 1), clientes ÷ 100, equipe ÷ 100, operação ÷ 100]`
+Primeiro, cada indicador é levado para a escala 0–100:
+
+- **Clientes, equipe e operação**: o próprio valor (0–100).
+- **Caixa**: proporcional. R$ 100.000 valem 50 pontos e R$ 200.000 valem 100 pontos (teto). Por exemplo, R$ 150.000 valem 75 pontos. Caixa negativo vale 0.
+
+Depois:
+
+`pontuação = 10 × [ 80% × média geométrica + 20% × média aritmética ]`
+
+- **Média geométrica (80%)**: premia o equilíbrio. Um indicador fraco puxa a nota para baixo, e um indicador zerado (derrota) anula essa parte.
+- **Média aritmética (20%)**: preserva o que foi construído. Mesmo numa derrota, sobra uma nota pequena.
 
 | Situação | Pontuação |
 |---|---:|
 | Terminar com 100.000 / 50 / 50 / 50 | 500 |
-| Caixa ≥ R$ 200.000 e os três indicadores em 100 | 1000 |
-| Derrota (algum indicador zerado) | pontuação × 0,3 |
+| R$ 200.000 e os três indicadores em 100 | 1000 |
+| 150.000 / 50 / 50 / 50 | 555 |
+| 125.000 / 62 / 63 / 62 (equilibrado) | 624 |
+| 50.000 / 75 / 75 / 75 (mesma média, desequilibrado) | 581 |
+| Derrota com os outros três em 80 | 120 |
 
-Cada indicador vale 250 pontos no máximo: 1 ponto de clientes/equipe/operação = 2,5 pontos de placar; R$ 1.000 de caixa = 1,25 ponto. Parâmetros em `js/core/gameConfig.js`.
+Não há penalidade extra de derrota: o zero na média geométrica já cumpre esse papel. Parâmetros em `js/core/gameConfig.js` (`pontuacao`).
 
 Desempate no ranking: mais indicadores em valor igual ou superior ao inicial, depois menos emergências expiradas, depois a partida mais antiga.
 
 ## Balanceamento dos dados
 
-Cada decisão (atividade, desdobramento ou emergência) tem 4 alternativas, todas com ganho e custo, e nenhuma domina outra. Para o placar, as alternativas de cada decisão têm saldo nominal em torno de **+19 / +0,5 / −2,5 / −16** pontos de placar (melhor, 2ª, 3ª, pior), distribuído por igual entre caixa, clientes, equipe e operação — ninguém ganha o jogo olhando só para um indicador. Resultado medido nas simulações (≈ 43 decisões por partida):
+Cada decisão (atividade, desdobramento ou emergência) tem 4 alternativas, sempre neste padrão de atributos (caixa, clientes, equipe, operação):
 
-| Estratégia | Pontuação média |
-|---|---:|
-| Sempre a melhor | ≈ 945 |
-| Sempre a 2ª melhor | ≈ 540 |
-| 2ª ou 3ª ao acaso | ≈ 465 |
-| Sempre a 3ª | ≈ 390 |
-| Escolhas aleatórias | ≈ 505 |
-| Sempre a pior | ≈ 70 (derrota antes do fim) |
+| Alternativa | Atributos | Saldo nominal típico |
+|---|---|---|
+| Melhor | 3 bons e 1 ruim | ganhos ≈ 3, custo ≈ 3 |
+| Duas intermediárias | 2 bons, 1 ruim e 1 estável | ganhos ≈ 2, custo ≈ 4 |
+| Pior | 1 bom, 2 ruins e 1 estável | ganho ≈ 2, custos ≈ 4 |
+
+Valores em pontos de indicador; no caixa, R$ 2.000 equivalem a 1 ponto (pouco menos nas decisões, para o melhor caminho terminar perto de R$ 200.000). Nenhuma alternativa domina outra, e o atributo ruim gira entre os quatro indicadores: ninguém ganha o jogo olhando só para um deles. Nas emergências, a alternativa escolhida quando o tempo acaba (`alternativa_pior_caso_id`) é sempre a de 1 bom e 2 ruins.
+
+Resultado medido nas simulações (300 partidas por estratégia, ≈ 43 decisões por partida):
+
+| Estratégia | Pontuação média | Indicadores finais (caixa / C / E / O) |
+|---|---:|---|
+| Sempre a melhor | ≈ 975 | ≈ R$ 200 mil / 98 / 99 / 98 |
+| Sempre a 2ª melhor | ≈ 540 | ≈ R$ 108 mil / 58 / 60 / 57 |
+| 2ª ou 3ª ao acaso | ≈ 465 | ≈ R$ 102 mil / 49 / 50 / 51 |
+| Sempre a 3ª | ≈ 400 | ≈ R$ 95 mil / 42 / 43 / 45 |
+| Escolhas aleatórias | ≈ 475 | ≈ R$ 99 mil / 51 / 53 / 52 |
+| Sempre a pior | ≈ 30 (derrota antes do fim em 100% das partidas) | |
+
+Nas estratégias intermediárias, de 2% a 6% das partidas ainda terminam em derrota por azar no sorteio (pontuação abaixo de 120).
 
 A "melhor" alternativa é a de maior saldo nominal; ela não é perfeita (sempre tem um custo) e não aparece indicada ao jogador.
 

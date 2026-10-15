@@ -1,4 +1,5 @@
 // Tela inicial: nickname, iniciar, continuar, ranking e explicação do jogo. Também a tela de erro fatal.
+import { REGRAS } from "./ajudaUI.js";
 import { el, porId, limpar, mostrarTela } from "./screenManager.js";
 import { CONFIG } from "../core/gameConfig.js";
 
@@ -29,12 +30,7 @@ export function renderInicio({ salvo, avisoStorage, nicknameSugerido = "" }, { o
       salvo ? el("p", { class: "nota" }, "Iniciar um novo jogo substitui a partida salva.") : null),
     el("div", { class: "inicio-explica" },
       el("h2", {}, "Como funciona"),
-      el("ul", {},
-        el("li", {}, "Você é o CEO: decida sobre pessoas, clientes, finanças, operação, marketing e desenvolvimento."),
-        el("li", {}, "Quatro indicadores importam: caixa, clientes, equipe e operação. Se qualquer um chegar a zero, a empresa acaba."),
-        el("li", {}, "São 20 atividades normais e 5 emergências com 2 minutos para decidir. Sem resposta, vale a pior alternativa."),
-        el("li", {}, "Decisões podem ter desdobramentos futuros (efeito borboleta). Pense no longo prazo."),
-        el("li", {}, "Seu progresso é salvo automaticamente neste navegador.")))));
+      el("ul", {}, REGRAS.map((r) => el("li", {}, r))))));
   input.focus();
 }
 

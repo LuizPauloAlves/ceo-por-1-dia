@@ -154,18 +154,29 @@ test("derrota por qualquer indicador zerado", () => {
   assert.equal(verificarDerrota({ financeiro: 1, clientes: 1, equipe: 1, operacao: 1 }), null);
 });
 
-test("pontuação: estado inicial = 500, máximo 1000, financeiro com teto, derrota penalizada", () => {
+test("pontuação: 80% geométrica + 20% aritmética; caixa 100k = 50, 200k = 100 (teto)", () => {
   const e = novo();
   assert.equal(calcularPontuacao(e), 500);
   e.indicadores = { financeiro: 1e9, clientes: 100, equipe: 100, operacao: 100 };
   e.resultado = { concluiu: true };
   assert.equal(calcularPontuacao(e), 1000);
-  e.indicadores = { financeiro: 200000, clientes: 0, equipe: 0, operacao: 0 };
-  assert.equal(calcularPontuacao(e), 250);
+  e.indicadores = { financeiro: 200000, clientes: 100, equipe: 100, operacao: 100 };
+  assert.equal(calcularPontuacao(e), 1000);
+  e.indicadores = { financeiro: 150000, clientes: 50, equipe: 50, operacao: 50 };
+  assert.equal(calcularPontuacao(e), 555); // caixa 75 pontos
   e.indicadores = { financeiro: 100000, clientes: 100, equipe: 50, operacao: 50 };
-  assert.equal(calcularPontuacao(e), 625);
-  e.status = "encerrada"; e.resultado = { concluiu: false };
-  assert.equal(calcularPontuacao(e), Math.round(625 * 0.3));
+  assert.equal(calcularPontuacao(e), 601);
+  // equilíbrio vale mais que concentração: mesma média aritmética (62,5), notas diferentes
+  e.indicadores = { financeiro: 125000, clientes: 62, equipe: 63, operacao: 62 };
+  const equilibrado = calcularPontuacao(e);
+  e.indicadores = { financeiro: 50000, clientes: 75, equipe: 75, operacao: 75 };
+  assert.equal(calcularPontuacao(e), 581);
+  assert.ok(equilibrado > 581);
+  // indicador zerado anula a parte geométrica: sobra só 20% da média aritmética
+  e.indicadores = { financeiro: 200000, clientes: 0, equipe: 0, operacao: 0 };
+  assert.equal(calcularPontuacao(e), 50);
+  e.indicadores = { financeiro: -5000, clientes: 80, equipe: 80, operacao: 80 };
+  assert.equal(calcularPontuacao(e), 120);
 });
 
 test("ranking: ordena, desempata, limita a 10, ignora partida repetida e cabe em cookies", () => {

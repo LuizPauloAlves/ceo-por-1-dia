@@ -26,7 +26,7 @@ export function renderResultado({ estado: e, ranking, erroRanking }, { onJogarNo
     el("h1", {}, ok ? "🏭 Empresa sobrevivente!" : "💥 Falência / colapso"),
     el("p", { class: "res-jogador" }, e.nickname),
     el("p", { class: "res-motivo" }, e.resultado.motivo),
-    el("div", { class: "res-pontuacao" }, el("span", {}, "Pontuação final"), el("strong", {}, e.pontuacao), el("small", {}, ok ? "de 1000 possíveis (valores iniciais = 500)" : "de 1000 possíveis (derrota: pontuação reduzida a 30%)")),
+    el("div", { class: "res-pontuacao" }, el("span", {}, "Pontuação final"), el("strong", {}, e.pontuacao), el("small", {}, ok ? "de 1000 possíveis (valores iniciais = 500)" : "de 1000 possíveis (indicador zerado: a parte geométrica, 80% da nota, vai a zero)")),
     el("div", { class: "stats" },
       stat("Atividades respondidas", `${e.progresso.normaisConcluidas}/${e.metas.normais}`),
       stat("Emergências no prazo", e.progresso.emergenciasNoPrazo),

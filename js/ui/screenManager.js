@@ -29,7 +29,10 @@ export function mostrarTela(nome) {
   limpezas.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
   limpezas = [];
   for (const t of TELAS) porId(`tela-${t}`).hidden = t !== nome;
-  porId("barra-fixa").hidden = !["jogo", "espera"].includes(nome);
+  const emPartida = ["jogo", "espera"].includes(nome);
+  porId("barra-fixa").hidden = !emPartida;
+  const ajuda = porId("ajuda");
+  if (ajuda) { ajuda.hidden = !emPartida; document.body.classList.toggle("com-ajuda", emPartida); }
   window.scrollTo({ top: 0 });
 }
 

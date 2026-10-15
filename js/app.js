@@ -13,6 +13,7 @@ import { renderEspera } from "./ui/waitUI.js";
 import { renderResultado } from "./ui/resultsUI.js";
 import { renderRanking } from "./ui/rankingUI.js";
 import { renderInicio, renderErro } from "./ui/startUI.js";
+import { montarAjuda } from "./ui/ajudaUI.js";
 import { mostrarBanner, removerBanner, confirmar } from "./ui/feedbackUI.js";
 
 const FLAG_SESSAO = "ceo1d:emJogo"; // sobrevive ao F5 mas não ao fechar a aba
@@ -100,7 +101,7 @@ function irParaInicio() {
 }
 
 async function main() {
-  montarDashboard();
+  montarDashboard(); montarAjuda();
   ligarEventos();
   let catalogo;
   try {

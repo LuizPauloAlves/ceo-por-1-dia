@@ -1,0 +1,15 @@
+/* Painel "Como funciona" durante a partida */
+.ajuda { background: var(--card); border-radius: var(--raio); box-shadow: var(--sombra); max-width: 920px; margin: 0 auto 2rem; width: calc(100% - 1.4rem); }
+.ajuda[hidden] { display: none; }
+.ajuda-det summary { cursor: pointer; list-style: none; padding: .8rem 1rem; font-weight: 700; color: var(--navy); user-select: none; }
+.ajuda-det summary::-webkit-details-marker { display: none; }
+.ajuda-icone { display: inline-block; width: 1.4rem; font-size: 1.15rem; }
+.ajuda-det ul { display: grid; gap: .5rem; padding: 0 1rem 1rem; font-size: .9rem; }
+.ajuda-det li { padding-left: 1.2rem; position: relative; }
+.ajuda-det li::before { content: "▸"; position: absolute; left: 0; color: var(--gold-d); font-weight: 700; }
+
+/* Telas largas: fixa na lateral direita, abaixo da barra de indicadores */
+@media (min-width: 1100px) {
+  body.com-ajuda { padding-right: 300px; }
+  body.com-ajuda .ajuda { position: fixed; right: 1rem; top: 11.5rem; width: 270px; margin: 0; max-height: calc(100vh - 13rem); overflow: auto; z-index: 10; }
+}

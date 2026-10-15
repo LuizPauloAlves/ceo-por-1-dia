@@ -1,5 +1,6 @@
 // Balanceamento: com a estratégia "melhor/2ª/3ª/pior alternativa" (ordem pela variação líquida nominal),
-// a pontuação final deve cair nas faixas combinadas. Estado inicial = 500; melhor caminho ~1000; pior ~100.
+// a pontuação final (80% geométrica + 20% aritmética) deve cair nas faixas combinadas.
+// Estado inicial = 500; melhor caminho ~1000; 2ª/3ª entre 350 e 550; pior ~100 ou menos.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { resetar, catalogoReal, semente } from "./helpers.js";
@@ -37,6 +38,24 @@ function rodar(estrategia, n = 40) {
   const rs = Array.from({ length: n }, (_, i) => jogar(i * 7 + 1, estrategia));
   return { media: media(rs.map((r) => r.pontuacao)), derrotas: rs.filter((r) => !r.resultado.concluiu).length, n };
 }
+
+test("padrão das alternativas: 3 bons/1 ruim, 2x (2 bons/1 ruim), 1 bom/2 ruins", () => {
+  const padrao = (imp) => {
+    const v = ["financeiro", "clientes", "equipe", "operacao"].map((k) => imp[k]?.padrao ?? 0);
+    return `${v.filter((x) => x > 0).length}+${v.filter((x) => x < 0).length}-`;
+  };
+  const alvo = ["1+2-", "2+1-", "2+1-", "3+1-"].join();
+  const conferir = (alts, rot) => assert.equal(alts.map((a) => padrao(a.impactos)).sort().join(), alvo, rot);
+  for (const a of c.atividades) {
+    conferir(a.alternativas, a.id);
+    for (const alt of a.alternativas) conferir(alt.borboleta.alternativas, alt.borboleta.id);
+  }
+  for (const em of c.emergencias) {
+    conferir(em.alternativas, em.id);
+    const pior = em.alternativas.find((x) => x.id === em.piorAlternativaId);
+    assert.equal(padrao(pior.impactos), "1+2-", `${em.id}: tempo esgotado escolhe a alternativa 1 bom / 2 ruins`);
+  }
+});
 
 test("estado inicial vale 500 pontos", () => {
   resetar(); E.iniciarEngine(c); E.novaPartida("X");
