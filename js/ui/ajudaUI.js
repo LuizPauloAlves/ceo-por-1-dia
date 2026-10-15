@@ -1,4 +1,5 @@
-// Painel "Como funciona": lateral direita fixa em telas largas; no fim da página (recolhido, ☰) em telas estreitas.
+// Painel "Como funciona": abre e fecha pelo botão ☰ no canto esquerdo da barra escura.
+// Telas largas: coluna à esquerda (aberta por padrão). Telas estreitas: gaveta sobre o conteúdo (fechada por padrão).
 import { el, porId } from "./screenManager.js";
 
 export const REGRAS = [
@@ -9,22 +10,53 @@ export const REGRAS = [
   "Seu progresso é salvo automaticamente neste navegador.",
 ];
 
-const larga = () => globalThis.matchMedia?.("(min-width: 1100px)").matches ?? true;
+const CHAVE = "ceo1d:ajuda";
+const mq = globalThis.matchMedia?.("(min-width: 1100px)");
+const larga = () => mq?.matches ?? true;
+const lerPref = () => { try { return localStorage.getItem(CHAVE); } catch { return null; } };
+const gravarPref = (v) => { try { localStorage.setItem(CHAVE, v); } catch { /* sem storage: só não lembra */ } };
 
-/** Monta o painel uma única vez dentro de #ajuda. */
+/** Monta o painel e o botão uma única vez. */
 export function montarAjuda() {
   const raiz = porId("ajuda");
-  if (!raiz || raiz.dataset.pronto) return;
+  const btn = porId("btn-ajuda");
+  if (!raiz || !btn || raiz.dataset.pronto) return;
   raiz.dataset.pronto = "1";
-  const det = el("details", { class: "ajuda-det" },
-    el("summary", {}, el("span", { class: "ajuda-icone", "aria-hidden": "true" }, "☰"), " Como funciona"),
-    el("ul", {}, REGRAS.map((r) => el("li", {}, r))));
-  raiz.append(det);
-  let tocou = false;
-  det.addEventListener("toggle", () => { if (det.open !== larga()) tocou = true; });
-  const ajustar = () => { if (!tocou) det.open = larga(); };
-  ajustar();
-  globalThis.matchMedia?.("(min-width: 1100px)").addEventListener?.("change", () => { tocou = false; ajustar(); });
+  raiz.append(
+    el("div", { class: "ajuda-topo" },
+      el("h2", { class: "ajuda-titulo" }, "Como funciona"),
+      el("button", { class: "ajuda-fechar", type: "button", "aria-label": "Recolher", title: "Recolher", onclick: () => alternar(false, true) }, "✕")),
+    el("ol", { class: "ajuda-lista" }, REGRAS.map((r) => el("li", {}, r))));
+
+  // Posição vertical logo abaixo da barra fixa (a altura muda com a largura da tela)
+  const barra = porId("barra-fixa");
+  const posicionar = () => {
+    const alt = barra && !barra.hidden ? barra.getBoundingClientRect().bottom : 0;
+    document.documentElement.style.setProperty("--ajuda-topo", `${Math.max(0, Math.round(alt))}px`);
+  };
+  if (globalThis.ResizeObserver && barra) new ResizeObserver(posicionar).observe(barra);
+  globalThis.addEventListener?.("resize", posicionar);
+  globalThis.addEventListener?.("scroll", posicionar, { passive: true });
+  globalThis.addEventListener?.("ajuda:layout", posicionar);
+
+  function alternar(aberto, doUsuario = false) {
+    document.body.classList.toggle("ajuda-aberta", aberto);
+    btn.setAttribute("aria-expanded", String(aberto));
+    btn.classList.toggle("ativo", aberto);
+    if (doUsuario && larga()) gravarPref(aberto ? "aberta" : "fechada");
+    posicionar();
+  }
+  const padrao = () => larga() && lerPref() !== "fechada";
+
+  btn.addEventListener("click", () => alternar(!document.body.classList.contains("ajuda-aberta"), true));
+  // Telas estreitas: tocar fora da gaveta ou apertar Esc fecha
+  document.addEventListener("click", (ev) => {
+    if (larga() || !document.body.classList.contains("ajuda-aberta")) return;
+    if (!raiz.contains(ev.target) && !btn.contains(ev.target)) alternar(false);
+  });
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !larga()) alternar(false); });
+  mq?.addEventListener?.("change", () => alternar(padrao()));
+  alternar(padrao());
 }
 
 /** Mostra/esconde o painel (visível só durante a partida). */

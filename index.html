@@ -25,6 +25,9 @@
 
   <!-- Barra fixa: cabeçalho + 4 indicadores (visível durante perguntas e emergências) -->
   <div id="barra-fixa" class="barra-fixa" hidden>
+    <button id="btn-ajuda" class="btn-ajuda" type="button" aria-controls="ajuda" aria-expanded="false" aria-label="Como funciona" title="Como funciona">
+      <span class="hamb" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
     <header id="cabecalho" class="cabecalho"></header>
     <section id="indicadores" class="indicadores" aria-label="Indicadores da empresa"></section>
   </div>
@@ -38,7 +41,7 @@
     <section id="tela-erro" class="tela" hidden></section>
   </main>
 
-  <!-- Como funciona: lateral direita (telas largas) ou no fim da página, recolhido (telas estreitas) -->
+  <!-- Como funciona: painel à esquerda, aberto/fechado pelo botão ☰ da barra (gaveta sobre a tela em telas estreitas) -->
   <aside id="ajuda" class="ajuda" hidden aria-label="Como funciona"></aside>
 
   <div id="modal" class="modal" hidden role="dialog" aria-modal="true"></div>

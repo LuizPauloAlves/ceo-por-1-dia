@@ -1,15 +1,42 @@
-/* Painel "Como funciona" durante a partida */
-.ajuda { background: var(--card); border-radius: var(--raio); box-shadow: var(--sombra); max-width: 920px; margin: 0 auto 2rem; width: calc(100% - 1.4rem); }
-.ajuda[hidden] { display: none; }
-.ajuda-det summary { cursor: pointer; list-style: none; padding: .8rem 1rem; font-weight: 700; color: var(--navy); user-select: none; }
-.ajuda-det summary::-webkit-details-marker { display: none; }
-.ajuda-icone { display: inline-block; width: 1.4rem; font-size: 1.15rem; }
-.ajuda-det ul { display: grid; gap: .5rem; padding: 0 1rem 1rem; font-size: .9rem; }
-.ajuda-det li { padding-left: 1.2rem; position: relative; }
-.ajuda-det li::before { content: "▸"; position: absolute; left: 0; color: var(--gold-d); font-weight: 700; }
+/* Botão ☰ no canto esquerdo da barra escura */
+.barra-fixa { position: sticky; }
+.btn-ajuda { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 12px;
+  display: grid; place-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: #fff;
+  cursor: pointer; transition: background .15s, border-color .15s; z-index: 2; }
+.btn-ajuda:hover { background: rgba(255,255,255,.16); }
+.btn-ajuda:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.btn-ajuda.ativo { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.hamb { display: grid; gap: 4px; width: 20px; }
+.hamb i { display: block; height: 2px; border-radius: 2px; background: currentColor; transition: transform .2s, opacity .2s; }
 
-/* Telas largas: fixa na lateral direita, abaixo da barra de indicadores */
+/* Painel */
+.ajuda { position: fixed; left: 1rem; top: calc(var(--ajuda-topo, 170px) + 1rem); width: 260px;
+  max-height: calc(100vh - var(--ajuda-topo, 170px) - 2rem); overflow: auto; z-index: 15;
+  background: var(--card); border-radius: var(--raio); box-shadow: var(--sombra); border-top: 4px solid var(--gold);
+  padding: 1rem 1.1rem 1.1rem; opacity: 0; transform: translateX(-12px); pointer-events: none; visibility: hidden;
+  transition: opacity .2s, transform .2s, visibility 0s linear .2s; }
+.ajuda[hidden] { display: none; }
+body.ajuda-aberta .ajuda { opacity: 1; transform: none; pointer-events: auto; visibility: visible; transition: opacity .2s, transform .2s; }
+.ajuda-topo { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .7rem; }
+.ajuda-titulo { margin: 0; font-size: 1.05rem; }
+.ajuda-fechar { width: 30px; height: 30px; border-radius: 8px; color: var(--muted); font-size: .95rem; cursor: pointer; }
+.ajuda-fechar:hover { background: var(--bg); color: var(--navy); }
+.ajuda-lista { display: grid; gap: .65rem; counter-reset: regra; font-size: .88rem; line-height: 1.45; }
+.ajuda-lista li { counter-increment: regra; position: relative; padding-left: 2rem; }
+.ajuda-lista li::before { content: counter(regra); position: absolute; left: 0; top: .05rem; width: 1.4rem; height: 1.4rem; border-radius: 50%;
+  background: var(--navy); color: #fff; font-size: .75rem; font-weight: 700; display: grid; place-items: center; }
+
+/* Telas largas: o conteúdo abre espaço para a coluna quando ela está aberta */
 @media (min-width: 1100px) {
-  body.com-ajuda { padding-right: 300px; }
-  body.com-ajuda .ajuda { position: fixed; right: 1rem; top: 11.5rem; width: 270px; margin: 0; max-height: calc(100vh - 13rem); overflow: auto; z-index: 10; }
+  body.com-ajuda.ajuda-aberta :is(.app, .cabecalho, .indicadores) { margin-left: max(calc(260px + 2.5rem), calc((100% - 920px) / 2)); margin-right: auto; }
+  :is(.app, .cabecalho, .indicadores) { transition: margin-left .2s; }
+}
+
+/* Telas médias/estreitas: o cabeçalho abre espaço para o botão; o painel vira gaveta sobre o conteúdo */
+@media (max-width: 1039px) {
+  .btn-ajuda { top: .45rem; transform: none; width: 36px; height: 36px; border-radius: 10px; left: .6rem; }
+  .barra-fixa .cabecalho { padding-left: 3.3rem; min-height: 44px; }
+}
+@media (max-width: 1099px) {
+  .ajuda { left: .6rem; width: min(300px, calc(100vw - 1.2rem)); box-shadow: 0 12px 40px rgba(15,42,67,.30); }
 }

@@ -32,7 +32,7 @@ export function mostrarTela(nome) {
   const emPartida = ["jogo", "espera"].includes(nome);
   porId("barra-fixa").hidden = !emPartida;
   const ajuda = porId("ajuda");
-  if (ajuda) { ajuda.hidden = !emPartida; document.body.classList.toggle("com-ajuda", emPartida); }
+  if (ajuda) { ajuda.hidden = !emPartida; document.body.classList.toggle("com-ajuda", emPartida); globalThis.dispatchEvent?.(new Event("ajuda:layout")); }
   window.scrollTo({ top: 0 });
 }
 
